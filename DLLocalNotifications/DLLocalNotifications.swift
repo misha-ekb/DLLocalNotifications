@@ -212,6 +212,33 @@ public class DLNotificationScheduler {
         
     }
     
+    public func repeatsFromToDateWithRandomAlert (identifier: String, alertTitle: String, alertBody: Array<String>, fromDate: Date, toDate: Date, interval: Double, repeats: RepeatingInterval, category: String = " ", sound: String = " ") {
+        var random = arc4random_uniform(UInt32(alertBody.count))
+        let notification = DLNotification(identifier: identifier, alertTitle: alertTitle, alertBody: alertBody[Int(random)], date: fromDate, repeats: repeats)
+        notification.category = category
+        notification.soundName = sound
+        // Create multiple Notifications
+        
+        self.queueNotification(notification: notification)
+        let intervalDifference = Int( toDate.timeIntervalSince(fromDate) / interval )
+        
+        var nextDate = fromDate
+        
+        for i in 0..<intervalDifference {
+            
+            // Next notification Date
+            
+            nextDate = nextDate.addingTimeInterval(interval)
+            let identifier = identifier + String(i + 1)
+            
+            random = arc4random_uniform(UInt32(alertBody.count))
+            let notification = DLNotification(identifier: identifier, alertTitle: alertTitle, alertBody: alertBody[Int(random)], date: nextDate, repeats: repeats)
+            notification.category = category
+            notification.soundName = sound
+            self.queueNotification(notification: notification)
+        }        
+    }
+    
     public func scheduleCategories(categories: [DLCategory]) {
         
         var notificationCategories = Set<UNNotificationCategory>()

@@ -150,6 +150,8 @@ public class DLNotificationScheduler {
             
             content.sound = notification.soundName == "" ? UNNotificationSound.default() : UNNotificationSound.init(named: notification.soundName)
             
+            content.badge = notification.badge as NSNumber
+            
             if (notification.soundName == "1") { content.sound = nil}
             
             if !(notification.attachments == nil) { content.attachments = notification.attachments! }
@@ -212,11 +214,13 @@ public class DLNotificationScheduler {
         
     }
     
-    public func repeatsFromToDateWithRandomAlert (identifier: String, alertTitle: String, alertBody: Array<String>, fromDate: Date, toDate: Date, interval: Double, repeats: RepeatingInterval, category: String = " ", sound: String = " ") {
+    public func repeatsFromToDateWithRandomAlert (identifier: String, alertTitle: String, alertBody: Array<String>, fromDate: Date, toDate: Date, interval: Double, repeats: RepeatingInterval, category: String = " ", sound: String = " ", badge: Int = 0) {
         var random = arc4random_uniform(UInt32(alertBody.count))
         let notification = DLNotification(identifier: identifier, alertTitle: alertTitle, alertBody: alertBody[Int(random)], date: fromDate, repeats: repeats)
         notification.category = category
         notification.soundName = sound
+        notification.badge = badge
+        
         // Create multiple Notifications
         
         self.queueNotification(notification: notification)
@@ -235,6 +239,7 @@ public class DLNotificationScheduler {
             let notification = DLNotification(identifier: identifier, alertTitle: alertTitle, alertBody: alertBody[Int(random)], date: nextDate, repeats: repeats)
             notification.category = category
             notification.soundName = sound
+            notification.badge = badge
             self.queueNotification(notification: notification)
         }        
     }
@@ -320,6 +325,8 @@ public class DLNotification {
     
     var hasDataFromBefore = false
     
+    var badge: Int = 0
+    
     public init(request: UNNotificationRequest) {
         
         self.hasDataFromBefore = true
@@ -346,7 +353,7 @@ public class DLNotification {
         
     }
     
-    public init (identifier: String, alertTitle: String, alertBody: String, date: Date?, repeats: RepeatingInterval, soundName: String ) {
+    public init (identifier: String, alertTitle: String, alertBody: String, date: Date?, repeats: RepeatingInterval, soundName: String, badge: Int = 0) {
         
         self.alertBody = alertBody
         self.alertTitle = alertTitle
@@ -354,6 +361,7 @@ public class DLNotification {
         self.repeatInterval = repeats
         self.soundName = soundName
         self.identifier = identifier
+        self.badge = badge
         
         if (repeats == .none) {
             self.repeats = false
